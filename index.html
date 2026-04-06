@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Pitch Perfect</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Onest:wght@400;500;600&display=swap');
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{--pink:#E8417A;--purple:#8B6CC8;--blue:#7EC8E3;--purple-l:#ede8f8;--bg:#f7f5ff;--surface:#fff;--border:#e4dff5;--text:#1a1230;--muted:#7a6f96;--radius:16px;--rsm:10px}
+body{font-family:'Onest',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;display:flex;flex-direction:column;align-items:center;padding:1.5rem 1rem 4rem}
+.logo{width:44px;height:44px;border-radius:50%;display:grid;grid-template-columns:1fr 1fr;grid-template-rows:1fr 1fr;overflow:hidden;margin-bottom:12px}
+.logo div:nth-child(1){background:var(--pink)}.logo div:nth-child(2){background:var(--purple)}.logo div:nth-child(3){background:var(--blue)}.logo div:nth-child(4){background:#b5a0e0}
+h1{font-size:24px;font-weight:600;background:linear-gradient(90deg,var(--pink),var(--purple));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;margin-bottom:4px;text-align:center}
+.subtitle{font-size:13px;color:var(--muted);margin-bottom:1.5rem;text-align:center}
+.container{width:100%;max-width:540px;display:flex;flex-direction:column;gap:12px}
+.card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:1.25rem}
+.card-label{font-size:11px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;margin-bottom:10px}
+.lp{color:var(--pink)}.lpu{color:var(--purple)}
+textarea{width:100%;border:1px solid var(--border);border-radius:var(--rsm);padding:10px 12px;font-size:14px;font-family:'Onest',sans-serif;background:var(--bg);color:var(--text);resize:none;outline:none;transition:border-color .15s}
+textarea:focus{border-color:var(--purple)}
+textarea::placeholder{color:var(--muted)}
+.mic-area{display:flex;flex-direction:column;align-items:center;gap:14px;padding:1.75rem 1rem;border:1.5px dashed var(--border);border-radius:var(--rsm);background:var(--bg);cursor:pointer;transition:all .2s}
+.mic-area:hover{border-color:var(--purple)}
+.mic-area.recording{border-color:var(--pink);background:#fff5f8}
+.mic-area.done{border-color:#1a9a5a;background:#f0fff7}
+.mic-btn{width:72px;height:72px;border-radius:50%;border:none;display:flex;align-items:center;justify-content:center;background:linear-gradient(135deg,var(--blue),var(--purple));pointer-events:none;position:relative}
+.mic-btn.recording{background:linear-gradient(135deg,var(--pink),#c43a6a)}
+.mic-btn.recording::after{content:'';position:absolute;inset:-8px;border-radius:50%;border:2px solid var(--pink);animation:pr 1.3s ease-out infinite}
+@keyframes pr{0%{transform:scale(1);opacity:.7}100%{transform:scale(1.5);opacity:0}}
+.timer{font-size:22px;font-weight:600;font-variant-numeric:tabular-nums;color:var(--pink);display:none}
+.timer.on{display:block}
+.st{font-size:13px;color:var(--muted);text-align:center;line-height:1.5}
+.st.rec{color:var(--pink);font-weight:500}.st.done{color:#1a7a4a;font-weight:500}
+.wc{font-size:12px;color:var(--muted);display:none}.wc.on{display:block}
+.tr-wrap{display:none;flex-direction:column;gap:6px;margin-top:4px}.tr-wrap.on{display:flex}
+.tr-lbl{font-size:11px;color:var(--muted);font-weight:500}
+.tr-box{background:var(--bg);border:1px solid var(--border);border-radius:var(--rsm);padding:10px 12px;font-size:13px;line-height:1.7;color:var(--text);max-height:160px;overflow-y:auto;white-space:pre-wrap;word-break:break-word}
+.interim{color:var(--muted);font-style:italic}
+.btn-clear{background:none;border:none;font-size:12px;color:var(--muted);cursor:pointer;text-decoration:underline;align-self:flex-end;font-family:'Onest',sans-serif}
+.btn-main{width:100%;padding:14px;border-radius:24px;border:none;font-size:15px;font-weight:600;font-family:'Onest',sans-serif;cursor:pointer;background:linear-gradient(90deg,var(--pink),var(--purple));color:#fff;display:flex;align-items:center;justify-content:center;gap:8px;transition:opacity .15s}
+.btn-main:hover{opacity:.9}.btn-main:disabled{opacity:.35;cursor:not-allowed}
+.btn-new{width:100%;padding:11px;border-radius:24px;border:1.5px solid var(--purple);background:transparent;color:var(--purple);font-size:14px;font-weight:500;font-family:'Onest',sans-serif;cursor:pointer;display:none}
+.btn-new.on{display:block}.btn-new:hover{background:var(--purple-l)}
+.loading{display:none;flex-direction:column;align-items:center;gap:10px;padding:2rem;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius)}
+.loading.on{display:flex}
+.ldots{display:flex;gap:6px}
+.ldot{width:9px;height:9px;border-radius:50%;animation:ldp 1.2s ease-in-out infinite}
+.ldot:nth-child(1){background:var(--pink);animation-delay:0s}.ldot:nth-child(2){background:var(--purple);animation-delay:.2s}.ldot:nth-child(3){background:var(--blue);animation-delay:.4s}
+@keyframes ldp{0%,80%,100%{transform:scale(.55);opacity:.4}40%{transform:scale(1);opacity:1}}
+.results{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);overflow:hidden;display:none}
+.results.on{display:block}
+.res-hdr{padding:.9rem 1.25rem;display:flex;align-items:center;gap:10px;border-bottom:1px solid var(--border)}
+.rdots{display:flex;gap:5px}.rdot{width:9px;height:9px;border-radius:50%}
+.scores{display:grid;grid-template-columns:repeat(3,1fr);gap:1px;background:var(--border);border-bottom:1px solid var(--border)}
+.sc{background:var(--surface);padding:10px 6px;text-align:center}
+.sc-n{font-size:20px;font-weight:600;display:block}.sc-l{font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.04em;display:block;margin-top:1px}
+.secs{padding:1rem;display:flex;flex-direction:column;gap:8px}
+.sec{border:1px solid var(--border);border-radius:var(--rsm);overflow:hidden}
+.sec-h{padding:10px 14px;display:flex;justify-content:space-between;align-items:center;cursor:pointer;user-select:none;background:var(--bg)}
+.sec-h:hover{background:#f0ecff}
+.sec-t{display:flex;align-items:center;gap:8px;font-size:13px;font-weight:500}
+.sdot{width:7px;height:7px;border-radius:50%}
+.sec-b{padding:0 14px;font-size:13px;line-height:1.7;color:var(--text);max-height:0;overflow:hidden;transition:max-height .3s,padding .2s}
+.sec-b.on{max-height:600px;padding:12px 14px;border-top:1px solid var(--border)}
+.chev{font-size:11px;color:var(--muted);transition:transform .2s}.chev.on{transform:rotate(180deg)}
+.badge{display:inline-block;padding:2px 10px;border-radius:10px;font-size:11px;font-weight:600}
+.by{background:#e6f9f0;color:#1a7a4a}.bp{background:#fff8e6;color:#9a6800}.bn{background:#fde8e8;color:#b02020}
+.blist{display:flex;flex-direction:column;gap:6px}
+.bi{display:flex;gap:8px;align-items:flex-start}
+.bdot{width:6px;height:6px;border-radius:50%;flex-shrink:0;margin-top:6px}
+.t3l{display:flex;flex-direction:column;gap:8px}
+.t3i{display:flex;gap:10px;align-items:flex-start}
+.t3n{width:22px;height:22px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:600;color:#fff;flex-shrink:0;margin-top:2px}
+.err{background:#fde8e8;border:1px solid #f5b8b8;border-radius:var(--rsm);padding:12px;font-size:13px;color:#b02020;display:none}
+.err.on{display:block}
+</style>
+</head>
+<body>
+<div class="logo"><div></div><div></div><div></div><div></div></div>
+<h1>Pitch Perfect</h1>
+<p class="subtitle">Жёсткий разбор твоего выступления</p>
+<div class="container">
+
+  <div class="card">
+    <div class="card-label lp">Цель выступления</div>
+    <textarea id="goal" rows="2" placeholder="Например: убедить команду принять новый процесс онбординга"></textarea>
+  </div>
+
+  <div class="card">
+    <div class="card-label lpu">Запись речи</div>
+    <div class="mic-area" id="ma" onclick="toggleRec()">
+      <button class="mic-btn" id="mb">
+        <svg width="30" height="30" viewBox="0 0 24 24" fill="white"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2M12 19v4M8 23h8" stroke="white" stroke-width="1.5" fill="none" stroke-linecap="round"/></svg>
+      </button>
+      <div class="timer" id="tmr">0:00</div>
+      <div class="st" id="st">Нажми, чтобы начать запись</div>
+      <div class="wc" id="wc"></div>
+    </div>
+    <div class="tr-wrap" id="trw">
+      <div class="tr-lbl">Расшифровка:</div>
+      <div class="tr-box" id="trb"></div>
+      <button class="btn-clear" onclick="clearRec()">очистить и записать заново</button>
+    </div>
+  </div>
+
+  <div class="err" id="err"></div>
+
+  <button class="btn-main" id="abtn" onclick="analyze()">
+    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22,2 15,22 11,13 2,9"/></svg>
+    Разобрать выступление
+  </button>
+
+  <div class="loading" id="ld">
+    <div class="ldots"><div class="ldot"></div><div class="ldot"></div><div class="ldot"></div></div>
+    <div style="font-size:13px;color:var(--muted)">Тренер разбирает выступление...</div>
+  </div>
+
+  <div class="results" id="res">
+    <div class="res-hdr">
+      <div class="rdots"><div class="rdot" style="background:var(--pink)"></div><div class="rdot" style="background:var(--purple)"></div><div class="rdot" style="background:var(--blue)"></div></div>
+      <span style="font-size:13px;font-weight:500;color:var(--muted)">Разбор готов</span>
+    </div>
+    <div class="scores" id="sco"></div>
+    <div class="secs" id="sec"></div>
+  </div>
+
+  <button class="btn-new" id="bnew" onclick="reset()">← Новое выступление</button>
+</div>
+
+<script>
+let isRec=false,rec=null,tint=null,secs=0,final='',interim='',restart=false;
+const SR=window.SpeechRecognition||window.webkitSpeechRecognition;
+
+function mkRec(){
+  if(!SR)return null;
+  const r=new SR();r.lang='ru-RU';r.continuous=true;r.interimResults=true;
+  r.onresult=e=>{let it='';for(let i=e.resultIndex;i<e.results.length;i++){if(e.results[i].isFinal)final+=e.results[i][0].transcript+' ';else it+=e.results[i][0].transcript;}interim=it;render();upWC();};
+  r.onerror=e=>{if(e.error==='not-allowed'){showErr('Нет доступа к микрофону. Разреши в браузере.');forceStop();}};
+  r.onend=()=>{if(restart&&isRec){try{rec.start();}catch(e){}}};
+  return r;
+}
+
+function toggleRec(){if(isRec)stopRec();else startRec();}
+
+function startRec(){
+  if(!SR){showErr('Используй Chrome или Edge.');return;}
+  restart=true;isRec=true;interim='';
+  rec=mkRec();try{rec.start();}catch(e){}
+  document.getElementById('mb').classList.add('recording');
+  document.getElementById('ma').classList.add('recording');
+  document.getElementById('ma').classList.remove('done');
+  document.getElementById('st').textContent='Запись идёт... говори';
+  document.getElementById('st').className='st rec';
+  document.getElementById('tmr').classList.add('on');
+  secs=0;clearInterval(tint);
+  tint=setInterval(()=>{secs++;const m=Math.floor(secs/60),s=secs%60;document.getElementById('tmr').textContent=m+':'+String(s).padStart(2,'0');},1000);
+}
+
+function stopRec(){
+  restart=false;isRec=false;
+  if(rec){try{rec.stop();}catch(e){}}
+  clearInterval(tint);
+  if(interim.trim()){final+=interim.trim()+' ';interim='';render();}
+  document.getElementById('mb').classList.remove('recording');
+  document.getElementById('ma').classList.remove('recording');
+  if(final.trim())document.getElementById('ma').classList.add('done');
+  document.getElementById('st').textContent=final.trim()?'Готово. Нажми снова — перезаписать.':'Пусто. Попробуй ещё раз.';
+  document.getElementById('st').className='st '+(final.trim()?'done':'');
+  upWC();
+}
+
+function forceStop(){restart=false;isRec=false;if(rec){try{rec.stop();}catch(e){}}clearInterval(tint);document.getElementById('mb').classList.remove('recording');document.getElementById('ma').classList.remove('recording');document.getElementById('st').className='st';}
+
+function render(){
+  const trw=document.getElementById('trw'),trb=document.getElementById('trb');
+  if(final||interim){trw.classList.add('on');trb.innerHTML=esc(final)+(interim?`<span class="interim">${esc(interim)}</span>`:'');trb.scrollTop=trb.scrollHeight;}
+}
+function upWC(){const w=final.trim().split(/\s+/).filter(x=>x).length,wc=document.getElementById('wc');wc.textContent=w+' слов записано';wc.classList.toggle('on',w>0);}
+function clearRec(){final='';interim='';document.getElementById('trw').classList.remove('on');document.getElementById('trb').innerHTML='';document.getElementById('wc').classList.remove('on');document.getElementById('ma').classList.remove('done');document.getElementById('st').textContent='Нажми, чтобы начать запись';document.getElementById('st').className='st';document.getElementById('tmr').textContent='0:00';document.getElementById('tmr').classList.remove('on');}
+function esc(s){return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
+
+async function analyze(){
+  const goal=document.getElementById('goal').value.trim();
+  const text=final.trim();
+  document.getElementById('err').classList.remove('on');
+  if(!goal){showErr('Укажи цель выступления.');return;}
+  if(!text||text.split(/\s+/).length<10){showErr('Слишком мало текста. Запиши хотя бы несколько предложений.');return;}
+  if(isRec)stopRec();
+  document.getElementById('abtn').disabled=true;
+  document.getElementById('ld').classList.add('on');
+  document.getElementById('res').classList.remove('on');
+  document.getElementById('bnew').classList.remove('on');
+
+  try{
+    const r=await fetch('/api/analyze',{
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:1000,messages:[{role:'user',content:`Ты — жёсткий тренер по публичным выступлениям. Анализируй строго только по тексту.\n\nЦель: ${goal}\nТекст речи: ${text}\n\nВерни ТОЛЬКО валидный JSON без markdown:\n{"goal_rewrite":null,"goal_achieved":"да|частично|нет","goal_achieved_reason":"1-2 предложения","goal_score":7,"structure_score":6,"structure_text":"2-3 предложения","args_score":5,"args_text":"2-3 предложения","strengths":["1","2"],"improve":["1","2","3"],"top3":["1","2","3"]}`}]})
+    });
+    const d=await r.json();
+    if(d.error)throw new Error(d.error.message);
+    const j=JSON.parse(d.content[0].text.replace(/```json|```/g,'').trim());
+    renderRes(j);
+  }catch(e){showErr('Ошибка: '+e.message);document.getElementById('abtn').disabled=false;}
+  finally{document.getElementById('ld').classList.remove('on');}
+}
+
+function renderRes(r){
+  const cl=['var(--pink)','var(--purple)','var(--blue)'];
+  document.getElementById('sco').innerHTML=[{l:'Цель',v:r.goal_score},{l:'Структура',v:r.structure_score},{l:'Аргументы',v:r.args_score}].map((s,i)=>`<div class="sc"><span class="sc-n" style="color:${cl[i]}">${s.v??'—'}</span><span class="sc-l">${s.l}</span></div>`).join('');
+  const bm={'да':'by','частично':'bp','нет':'bn'};const bt={'да':'Донесена','частично':'Частично','нет':'Не донесена'};
+  const ga=(r.goal_achieved||'').toLowerCase();
+  const ss=[
+    {c:'var(--pink)',t:'Цель',o:true,b:`${r.goal_rewrite?`<p style="margin-bottom:8px"><b>Переформулировано:</b> ${r.goal_rewrite}</p>`:''}<p>Результат: <span class="badge ${bm[ga]||'bp'}">${bt[ga]||r.goal_achieved}</span></p><p style="margin-top:8px;color:var(--muted)">${r.goal_achieved_reason}</p>`},
+    {c:'var(--purple)',t:'Структура',o:true,b:`<p>${r.structure_text}</p>`},
+    {c:'var(--blue)',t:'Аргументы',b:`<p>${r.args_text}</p>`},
+    {c:'var(--pink)',t:'Сильные стороны',b:bl(r.strengths,'var(--pink)')},
+    {c:'var(--purple)',t:'Что улучшить',b:bl(r.improve,'var(--purple)')},
+    {c:'var(--pink)',t:'Топ-3 рекомендации',b:t3(r.top3)}
+  ];
+  document.getElementById('sec').innerHTML=ss.map(s=>`<div class="sec"><div class="sec-h" onclick="tog(this)"><div class="sec-t"><div class="sdot" style="background:${s.c}"></div><span>${s.t}</span></div><span class="chev ${s.o?'on':''}">▾</span></div><div class="sec-b ${s.o?'on':''}">${s.b}</div></div>`).join('');
+  document.getElementById('res').classList.add('on');
+  document.getElementById('bnew').classList.add('on');
+  document.getElementById('abtn').disabled=false;
+  document.getElementById('res').scrollIntoView({behavior:'smooth',block:'start'});
+}
+
+function bl(a,c){return`<div class="blist">${(a||[]).map(s=>`<div class="bi"><div class="bdot" style="background:${c}"></div><span>${s}</span></div>`).join('')}</div>`;}
+function t3(a){const c=['var(--pink)','var(--purple)','var(--blue)'];return`<div class="t3l">${(a||[]).map((s,i)=>`<div class="t3i"><div class="t3n" style="background:${c[i]}">${i+1}</div><span>${s}</span></div>`).join('')}</div>`;}
+function tog(h){const b=h.nextElementSibling,c=h.querySelector('.chev');b.classList.toggle('on');c.classList.toggle('on');}
+function showErr(m){const e=document.getElementById('err');e.textContent=m;e.classList.add('on');}
+function reset(){clearRec();document.getElementById('goal').value='';document.getElementById('res').classList.remove('on');document.getElementById('bnew').classList.remove('on');document.getElementById('err').classList.remove('on');document.getElementById('abtn').disabled=false;window.scrollTo({top:0,behavior:'smooth'});}
+</script>
+</body>
+</html>
